@@ -8,11 +8,12 @@ app = Flask(__name__)
 serverNm = -1
 chatMap = {}
 
-@app.route("/<roomNm>", defaults={'roomNm': "general"})
-def homeGet():
+@app.route("/<roomNm>")
+@app.route("/" , defaults={'roomNm': "general"})
+def homeGet(roomNm):
     return send_from_directory("/app/", 'index.html')
 
-@app.route("/api/chat/<roomNm>",defaults={'roomNm': "general"}, methods=['GET'])
+@app.route("/api/chat/<roomNm>", methods=['GET'])
 def chatGet(roomNm):
     return '\n'.join(getChat(roomNm))
 
