@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from datetime import datetime
+import sys
 
 app = Flask(__name__)
 
@@ -7,39 +8,38 @@ app = Flask(__name__)
 serverNm = -1
 chatMap = {}
 
-@app.route("/<room>")
-def home():
-    return app.send_static_file('index.html')
+@app.route("/<roomNm>", defaults={'roomNm': "general"})
+def homeGet():
+    return send_from_directory("/app/", 'index.html')
 
-@app.route("/chat/<room>}", methods=['GET'])
-def update():
-    room = request.view_args['room']
-    return '\n'.join(chatMap[room])
+@app.route("/api/chat/<roomNm>",defaults={'roomNm': "general"}, methods=['GET'])
+def chatGet(roomNm):
+    return '\n'.join(getChat(roomNm))
 
-@app.route("/chat/<room>}", methods=['POST'])
-def update():
-    roomNm = request.view_args['room']
-    usr = request.form['User name']
-    msg = request.form['message']
+@app.route("/api/chat/<roomNm>", methods=['POST'])
+def chetPost(roomNm):
+    usr = request.form['username']
+    msg = request.form['msg']
     chat = getChat(roomNm)
     addUserMsg(chat, usr, msg)
+    return ""
     
 def getChat(roomNm):
     if roomNm not in chatMap :
         #create chat in map & add head message
         nuchat = []
-        nuchat.add("This is chat room " + str(roomNm) 
-                    + " in server " + str(severNm))
+        nuchat.append("This is chat room " + str(roomNm) + " in server " + str(serverNm))
         chatMap[roomNm] = nuchat
     return chatMap[roomNm]
 
 def addUserMsg(chat, usr, msg):
-    time = str(datetime.now("[y%-m%-- H%-M%-S%]"))
-    chatLine = time + " " + user + ": " + msg
+    time = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
+    chatLine = time + " " + usr + ": " + msg
     chat.append(chatLine)
 
 if __name__ == '__main__':
-    if sys.arg[1] :
-        serverNm = sys.arg[1]
+    print("v 19")
+    if sys.argv[1] :
+        serverNm = sys.argv[1]
 
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
