@@ -3,16 +3,16 @@ version: '3'
 services:
     loadbalance:
         build: ./nginx
-        container_name: lbalance
         ports:
-            - "80:80"
+            - '80:80'
         networks: 
             - backend
+        depends_on: 
+            - log
     log:
         build: ./app
-        container_name: chatSev
         ports: 
-            - '8081-8084:5000'
+            - '101-103'
         networks: 
             - backend
 networks:
